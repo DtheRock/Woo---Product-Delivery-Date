@@ -315,6 +315,19 @@ function cpdd_plugin_action_links( $links ) {
         '">' . __('Settings', 'customize-product-delivery-date') . '</a>';
     return $links;
 }
+
+// Display the message at the checkout page
+add_action( 'woocommerce_after_checkout_billing_form', 'cpdd_display_message' );
+function cpdd_display_message( $checkout ) {
+    // Get the message
+    $message = get_option( 'cpdd_messages' );
+
+    // Display the message if it is set
+    if ( !empty( $message ) ) {
+        echo '<p>' . $message . '</p>';
+    }
+}
+
 add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'cpdd_plugin_action_links' );
 
 ?>
