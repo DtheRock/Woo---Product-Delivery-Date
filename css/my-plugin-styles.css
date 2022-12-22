@@ -1,0 +1,14 @@
+@media only screen and (max-width: 600px) {
+    .cp-orders-with-delivery-dates-table th,
+    .cp-orders-with-delivery-dates-table td {
+        display: block;
+    }
+
+    .cp-orders-with-delivery-dates-table th {
+        font-size: 14px;
+    }
+}
+
+.delivery-date-within-two-days {
+    background-color: #FFA500;
+}
