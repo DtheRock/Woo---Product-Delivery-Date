@@ -12,6 +12,7 @@ Text Domain: customize-product-delivery-date
 */
 
 include_once(plugin_dir_path(__FILE__) . 'dateorderstable.php');
+include_once(plugin_dir_path(__FILE__) . 'dateorderscolumn.php');
 
 function my_plugin_styles() {
     wp_enqueue_style( 'my-plugin-styles', plugin_dir_url( __FILE__ ) . 'css/my-plugin-styles.css' );
