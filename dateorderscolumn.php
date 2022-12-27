@@ -15,7 +15,8 @@ function cpdd_admin_order_delivery_date_column($column) {
 		
 		// Validate data
 		if ( ! empty( $delivery_date ) ) {
-			echo $delivery_date;
+			// Escape all variables and options
+			echo esc_html( $delivery_date );
 		}
     }
 }
