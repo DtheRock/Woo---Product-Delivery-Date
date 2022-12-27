@@ -211,7 +211,7 @@ function wooproddel_add_admin_page() {
 function wooproddel_orders_with_delivery_dates_callback() {
     //escaping the output
     echo '<h1>' . esc_html__('Orders with Delivery Dates', 'customize-product-delivery-date') . '</h1>';
-    $orders_with_delivery_dates_table = new CP_Orders_With_Delivery_Dates_Table();
+    $orders_with_delivery_dates_table = new wooproddelclass_Orders_With_Delivery_Dates_Table();
     $orders_with_delivery_dates_table->prepare_items();
     $orders_with_delivery_dates_table->display();
 }

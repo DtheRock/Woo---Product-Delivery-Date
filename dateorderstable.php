@@ -4,7 +4,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class CP_Orders_With_Delivery_Dates_Table extends WP_List_Table {
+class wooproddelclass_Orders_With_Delivery_Dates_Table extends WP_List_Table {
     public function __construct() {
         parent::__construct( array(
             'singular' => esc_html__('Order with Delivery Date', 'customize-product-delivery-date'),
