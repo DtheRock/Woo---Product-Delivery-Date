@@ -49,7 +49,7 @@ function cpdd_date_validation() {
     if (  !empty( $delivery_date ) && $delivery_date < $min_date || $delivery_date > $max_date ) {
         // Add an error
         //internationalizing the error message
-        wc_add_notice( esc_html__('Please select a delivery date between ' . $min_date . ' and ' . $max_date, 'customize-product-delivery-date'), 'error' );
+        wc_add_notice( esc_html__('Please select a delivery date between ' . esc_html($min_date) . ' and ' . esc_html($max_date), 'customize-product-delivery-date'), 'error' );
     }
 }
 
@@ -231,5 +231,10 @@ function cpdd_display_message( $checkout ) {
 }
 
 add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'cpdd_plugin_action_links' );
+
+function cpdd_plugin_action_links($links){
+    $links[] = '<a href="'. esc_url( get_admin_url(null, 'admin.php?page=cpdd_settings') ) .'">Settings</a>';
+    return $links;
+}
 
 ?>
