@@ -14,8 +14,8 @@ Text Domain: customize-product-delivery-date
 include_once(plugin_dir_path(__FILE__) . 'dateorderstable.php');
 include_once(plugin_dir_path(__FILE__) . 'dateorderscolumn.php');
 
-function pluginstyles() {
-    wp_enqueue_style( 'pluginstyles', plugin_dir_url( __FILE__ ) . 'css/styles.css' );
+function wooproddelpluginstyles() {
+    wp_enqueue_style( 'wooproddelpluginstyles', plugin_dir_url( __FILE__ ) . 'css/styles.css' );
 
     //escaping the inline styles 
     $inline_styles = wp_strip_all_tags('.cp-orders-with-delivery-dates-table th,
@@ -28,18 +28,18 @@ function pluginstyles() {
                        .cp-orders-with-delivery-dates-table th {
                            font-size: 14px;
                        }');
-    wp_add_inline_style( 'pluginstyles', $inline_styles );
+    wp_add_inline_style( 'wooproddelpluginstyles', $inline_styles );
 }
-add_action( 'wp_enqueue_scripts', 'pluginstyles' );
-add_action( 'woocommerce_checkout_process', 'cpdd_date_validation' );
-function cpdd_date_validation() {
+add_action( 'wp_enqueue_scripts', 'wooproddelpluginstyles' );
+add_action( 'woocommerce_checkout_process', 'wooproddel_date_validation' );
+function wooproddel_date_validation() {
     // Get the min and max delivery time
-    $min_delivery_time = get_option( 'cpdd_min_delivery_time' );
-    $max_delivery_time = get_option( 'cpdd_max_delivery_time' );
+    $min_delivery_time = get_option( 'wooproddel_min_delivery_time' );
+    $max_delivery_time = get_option( 'wooproddel_max_delivery_time' );
 
     // Get the delivery date
     //sanitizing the input fields
-    $delivery_date = sanitize_text_field($_POST['cpdd_delivery_date']);
+    $delivery_date = sanitize_text_field($_POST['wooproddel_delivery_date']);
 
     // Calculate the min and max date
     $min_date = date('Y-m-d', strtotime('+' . intval($min_delivery_time) . ' days'));
@@ -54,35 +54,35 @@ function cpdd_date_validation() {
 }
 
 // Add the delivery date field to the checkout page
-add_action( 'woocommerce_after_checkout_billing_form', 'cpdd_add_delivery_date_field' );
-function cpdd_add_delivery_date_field( $checkout ) {
-    echo '<div id="cpdd_delivery_date_field"><h3>' . esc_html__('', 'customize-product-delivery-date') . '</h3>';
+add_action( 'woocommerce_after_checkout_billing_form', 'wooproddel_add_delivery_date_field' );
+function wooproddel_add_delivery_date_field( $checkout ) {
+    echo '<div id="wooproddel_delivery_date_field"><h3>' . esc_html__('', 'customize-product-delivery-date') . '</h3>';
 
-    woocommerce_form_field( 'cpdd_delivery_date', array(
+    woocommerce_form_field( 'wooproddel_delivery_date', array(
         'type'          => 'date',
         'class'         => array('my-field-class form-row-wide'),
         //internationalizing the label 
         'label'         => esc_html__('Select a delivery date', 'customize-product-delivery-date'),
         'required'      => false,
-    ), $checkout->get_value( 'cpdd_delivery_date' ));
+    ), $checkout->get_value( 'wooproddel_delivery_date' ));
 
     echo '</div>';
 }
 
 // Save the delivery date to the order meta data
-add_action( 'woocommerce_checkout_update_order_meta', 'cpdd_save_delivery_date' );
-function cpdd_save_delivery_date( $order_id ) {
-    if ( ! empty( $_POST['cpdd_delivery_date'] ) ) {
+add_action( 'woocommerce_checkout_update_order_meta', 'wooproddel_save_delivery_date' );
+function wooproddel_save_delivery_date( $order_id ) {
+    if ( ! empty( $_POST['wooproddel_delivery_date'] ) ) {
         //sanitizing the input fields
-        update_post_meta( $order_id, '_cpdd_delivery_date', sanitize_text_field( $_POST['cpdd_delivery_date'] ) );
+        update_post_meta( $order_id, '_wooproddel_delivery_date', sanitize_text_field( $_POST['wooproddel_delivery_date'] ) );
     }
 }
 
 // Display the delivery date on the order view page
-add_action( 'woocommerce_admin_order_data_after_billing_address', 'cpdd_display_delivery_date' );
-function cpdd_display_delivery_date( $order ){
+add_action( 'woocommerce_admin_order_data_after_billing_address', 'wooproddel_display_delivery_date' );
+function wooproddel_display_delivery_date( $order ){
     //getting the post meta and sanitizing it
-    $delivery_date = get_post_meta( $order->id, '_cpdd_delivery_date', true );
+    $delivery_date = get_post_meta( $order->id, '_wooproddel_delivery_date', true );
     if ( $delivery_date ) {
         //escaping the output
         echo '<p><strong>' . esc_html__('Delivery Date', 'customize-product-delivery-date') . ':</strong> ' . esc_html($delivery_date) . '</p>';
@@ -90,103 +90,103 @@ function cpdd_display_delivery_date( $order ){
 }
 
 // Add the settings page
-add_action( 'admin_menu', 'cpdd_add_settings_page' );
-function cpdd_add_settings_page() {
+add_action( 'admin_menu', 'wooproddel_add_settings_page' );
+function wooproddel_add_settings_page() {
     add_submenu_page(
         'woocommerce',
         esc_html__('Delivery Date Settings', 'customize-product-delivery-date'),
         esc_html__('Delivery Date', 'customize-product-delivery-date'),
         'manage_options',
-        'cpdd_settings',
-        'cpdd_settings_page_callback'
+        'wooproddel_settings',
+        'wooproddel_settings_page_callback'
     );
 }
 
 // Settings page callback
-function cpdd_settings_page_callback() {
+function wooproddel_settings_page_callback() {
     //escaping the output
     echo '<h1>' . esc_html__('Delivery Date Settings', 'customize-product-delivery-date') . '</h1>';
     echo '<form method="post" action="options.php">';
-    settings_fields( 'cpdd_settings' );
-    do_settings_sections( 'cpdd_settings' );
+    settings_fields( 'wooproddel_settings' );
+    do_settings_sections( 'wooproddel_settings' );
     submit_button();
     echo '</form>';
 }
 
 // Register settings
-add_action( 'admin_init', 'cpdd_register_settings' );
-function cpdd_register_settings() {
-    register_setting( 'cpdd_settings', 'cpdd_min_delivery_time', 'intval' );
-    register_setting( 'cpdd_settings', 'cpdd_max_delivery_time', 'intval' );
-    register_setting( 'cpdd_settings', 'cpdd_messages', 'wp_kses_post' );
+add_action( 'admin_init', 'wooproddel_register_settings' );
+function wooproddel_register_settings() {
+    register_setting( 'wooproddel_settings', 'wooproddel_min_delivery_time', 'intval' );
+    register_setting( 'wooproddel_settings', 'wooproddel_max_delivery_time', 'intval' );
+    register_setting( 'wooproddel_settings', 'wooproddel_messages', 'wp_kses_post' );
 
     add_settings_section(
-        'cpdd_settings_section',
+        'wooproddel_settings_section',
         esc_html__('Delivery Date Settings', 'customize-product-delivery-date'),
-        'cpdd_settings_section_callback',
-        'cpdd_settings'
+        'wooproddel_settings_section_callback',
+        'wooproddel_settings'
     );
 
     add_settings_field(
-        'cpdd_min_delivery_time',
+        'wooproddel_min_delivery_time',
         esc_html__('Minimum Delivery Time (days)', 'customize-product-delivery-date'),
-        'cpdd_min_delivery_time_callback',
-        'cpdd_settings',
-        'cpdd_settings_section'
+        'wooproddel_min_delivery_time_callback',
+        'wooproddel_settings',
+        'wooproddel_settings_section'
     );
 
     add_settings_field(
-        'cpdd_max_delivery_time',
+        'wooproddel_max_delivery_time',
         esc_html__('Maximum Delivery Time (days)', 'customize-product-delivery-date'),
-        'cpdd_max_delivery_time_callback',
-        'cpdd_settings',
-        'cpdd_settings_section'
+        'wooproddel_max_delivery_time_callback',
+        'wooproddel_settings',
+        'wooproddel_settings_section'
     );
 
     add_settings_field(
-        'cpdd_messages',
+        'wooproddel_messages',
         esc_html__('Messages', 'customize-product-delivery-date'),
-        'cpdd_messages_callback',
-        'cpdd_settings',
-        'cpdd_settings_section'
+        'wooproddel_messages_callback',
+        'wooproddel_settings',
+        'wooproddel_settings_section'
     );
 }
 
 // Settings section callback
-function cpdd_settings_section_callback() {
+function wooproddel_settings_section_callback() {
     //escaping the output
     echo '<p>' . esc_html__('Configure the delivery date settings', 'customize-product-delivery-date') . '</p>';
 }
 
 
 // Minimum delivery time callback
-function cpdd_min_delivery_time_callback() {
+function wooproddel_min_delivery_time_callback() {
     //getting the option value and sanitizing it
-    $value = get_option( 'cpdd_min_delivery_time', 0 );
-    echo '<input type="number" name="cpdd_min_delivery_time" value="' . esc_attr( $value ) . '" />';
+    $value = get_option( 'wooproddel_min_delivery_time', 0 );
+    echo '<input type="number" name="wooproddel_min_delivery_time" value="' . esc_attr( $value ) . '" />';
 }
 
 // Maximum delivery time callback
-function cpdd_max_delivery_time_callback() {
+function wooproddel_max_delivery_time_callback() {
     //getting the option value and sanitizing it
-    $value = get_option( 'cpdd_max_delivery_time', 0 );
-    echo '<input type="number" name="cpdd_max_delivery_time" value="' . esc_attr( $value ) . '" />';
+    $value = get_option( 'wooproddel_max_delivery_time', 0 );
+    echo '<input type="number" name="wooproddel_max_delivery_time" value="' . esc_attr( $value ) . '" />';
 }
 
 // Messages callback
-function cpdd_messages_callback() {
+function wooproddel_messages_callback() {
     //getting the option value and sanitizing it
-    $value = get_option( 'cpdd_messages', '' );
-    echo '<textarea name="cpdd_messages" rows="5" cols="50">' . wp_kses_post( $value ) . '</textarea>';
+    $value = get_option( 'wooproddel_messages', '' );
+    echo '<textarea name="wooproddel_messages" rows="5" cols="50">' . wp_kses_post( $value ) . '</textarea>';
 }
 
 // Add delivery date to WooCommerce order email notifications
-add_filter( 'woocommerce_email_order_meta_fields', 'cpdd_add_delivery_date_email_notification', 10, 3 );
-function cpdd_add_delivery_date_email_notification( $fields, $sent_to_admin, $order ) {
+add_filter( 'woocommerce_email_order_meta_fields', 'wooproddel_add_delivery_date_email_notification', 10, 3 );
+function wooproddel_add_delivery_date_email_notification( $fields, $sent_to_admin, $order ) {
     //getting the post meta and sanitizing it
-    $delivery_date = get_post_meta( $order->id, '_cpdd_delivery_date', true );
+    $delivery_date = get_post_meta( $order->id, '_wooproddel_delivery_date', true );
     if ( $delivery_date ) {
-        $fields['_cpdd_delivery_date'] = array(
+        $fields['_wooproddel_delivery_date'] = array(
             'label' => esc_html__('Delivery Date', 'customize-product-delivery-date'),
             'value' => sanitize_text_field($delivery_date)
         );
@@ -195,20 +195,20 @@ function cpdd_add_delivery_date_email_notification( $fields, $sent_to_admin, $or
 }
 
 // Create a custom admin page to display orders with delivery dates
-add_action( 'admin_menu', 'cpdd_add_admin_page' );
-function cpdd_add_admin_page() {
+add_action( 'admin_menu', 'wooproddel_add_admin_page' );
+function wooproddel_add_admin_page() {
     add_submenu_page(
         'woocommerce',
         esc_html__('Orders with Delivery Dates', 'customize-product-delivery-date'),
         esc_html__('Orders with Delivery Dates', 'customize-product-delivery-date'),
         'manage_options',
-        'cpdd_orders_with_delivery_dates',
-        'cpdd_orders_with_delivery_dates_callback'
+        'wooproddel_orders_with_delivery_dates',
+        'wooproddel_orders_with_delivery_dates_callback'
     );
 }
 
 // Custom admin page callback
-function cpdd_orders_with_delivery_dates_callback() {
+function wooproddel_orders_with_delivery_dates_callback() {
     //escaping the output
     echo '<h1>' . esc_html__('Orders with Delivery Dates', 'customize-product-delivery-date') . '</h1>';
     $orders_with_delivery_dates_table = new CP_Orders_With_Delivery_Dates_Table();
@@ -217,11 +217,11 @@ function cpdd_orders_with_delivery_dates_callback() {
 }
 
 // Display the message at the checkout page
-add_action( 'woocommerce_after_checkout_billing_form', 'cpdd_display_message' );
-function cpdd_display_message( $checkout ) {
+add_action( 'woocommerce_after_checkout_billing_form', 'wooproddel_display_message' );
+function wooproddel_display_message( $checkout ) {
     // Get the message
     //getting the option value and sanitizing it
-    $message = get_option( 'cpdd_messages' );
+    $message = get_option( 'wooproddel_messages' );
 
     // Display the message if it is set
     if ( !empty( $message ) ) {
@@ -230,10 +230,10 @@ function cpdd_display_message( $checkout ) {
     }
 }
 
-add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'cpdd_plugin_action_links' );
+add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'wooproddel_plugin_action_links' );
 
-function cpdd_plugin_action_links($links){
-    $links[] = '<a href="'. esc_url( get_admin_url(null, 'admin.php?page=cpdd_settings') ) .'">Settings</a>';
+function wooproddel_plugin_action_links($links){
+    $links[] = '<a href="'. esc_url( get_admin_url(null, 'admin.php?page=wooproddel_settings') ) .'">Settings</a>';
     return $links;
 }
 

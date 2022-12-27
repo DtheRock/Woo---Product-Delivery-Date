@@ -98,7 +98,7 @@ class CP_Orders_With_Delivery_Dates_Table extends WP_List_Table {
                 ORDER BY delivery_date ASC";
         $sql .= " LIMIT %d";
         $sql .= ' OFFSET ' . ( $page_number - 1 ) * $per_page;
-        $result = $wpdb->get_results( $wpdb->prepare( $sql, 'shop_order', '_cpdd_delivery_date', $per_page ), ARRAY_A );
+        $result = $wpdb->get_results( $wpdb->prepare( $sql, 'shop_order', '_wooproddel_delivery_date', $per_page ), ARRAY_A );
 		
 		// Escape/Sanitize all the data before returning.
 		foreach ( $result as &$item ) {
@@ -116,11 +116,11 @@ class CP_Orders_With_Delivery_Dates_Table extends WP_List_Table {
                 INNER JOIN {$wpdb->prefix}postmeta pm ON pm.post_id = p.ID
                 WHERE p.post_type = %s
                 AND pm.meta_key = %s";
-        return $wpdb->get_var( $wpdb->prepare( $sql, 'shop_order', '_cpdd_delivery_date' ) );
+        return $wpdb->get_var( $wpdb->prepare( $sql, 'shop_order', '_wooproddel_delivery_date' ) );
     }
 }
 
-add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'cpdd_plugin_action_links' );
+add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'wooproddel_plugin_action_links' );
 
 /**
  * Add settings link to plugin list table
@@ -129,9 +129,9 @@ add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'cpdd_plugin_act
  *
  * @return array 		Modified links
  */
-function cpdd_plugin_action_links( $links ) {
+function wooproddel_plugin_action_links( $links ) {
     $links[] = '<a href="' .
-        esc_url( admin_url( 'admin.php?page=cpdd_settings' ) ) .
+        esc_url( admin_url( 'admin.php?page=wooproddel_settings' ) ) .
         '">' . esc_html__('Settings', 'customize-product-delivery-date') . '</a>';
     return $links;
 }
