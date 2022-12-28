@@ -120,20 +120,5 @@ class wooproddelclass_Orders_With_Delivery_Dates_Table extends WP_List_Table {
     }
 }
 
-add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'wooproddel_plugin_action_links' );
-
-/**
- * Add settings link to plugin list table
- *
- * @param  array $links Existing links
- *
- * @return array 		Modified links
- */
-function wooproddel_plugin_action_links( $links ) {
-    $links[] = '<a href="' .
-        esc_url( admin_url( 'admin.php?page=wooproddel_settings' ) ) .
-        '">' . esc_html__('Settings', 'customize-product-delivery-date') . '</a>';
-    return $links;
-}
 
 ?>
