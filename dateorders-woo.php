@@ -56,17 +56,17 @@ function wooproddel_date_validation() {
 // Add the delivery date field to the checkout page
 add_action( 'woocommerce_after_checkout_billing_form', 'wooproddel_add_delivery_date_field' );
 function wooproddel_add_delivery_date_field( $checkout ) {
-    echo '<div id="wooproddel_delivery_date_field"><h3>' . esc_html__('', 'customize-product-delivery-date') . '</h3>';
+    echo '<div id="wooproddel_delivery_date_field"><h3>' . '</h3>';
 
-    woocommerce_form_field( 'wooproddel_delivery_date', array(
-        'type'          => 'date',
-        'class'         => array('my-field-class form-row-wide'),
-        //internationalizing the label 
-        'label'         => esc_html__('Select a delivery date', 'customize-product-delivery-date'),
-        'required'      => false,
-    ), $checkout->get_value( 'wooproddel_delivery_date' ));
+		woocommerce_form_field( 'wooproddel_delivery_date', array(
+			'type'          => 'date',
+			'class'         => array('my-field-class form-row-wide'),
+			//internationalizing the label 
+			'label'         => esc_html__('Select a delivery date', 'customize-product-delivery-date'),
+			'required'      => false,
+		), $checkout->get_value( 'wooproddel_delivery_date' ));
 
-    echo '</div>';
+		echo '</div>';
 }
 
 // Save the delivery date to the order meta data
