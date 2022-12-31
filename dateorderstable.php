@@ -27,7 +27,13 @@ class wooproddelclass_Orders_With_Delivery_Dates_Table extends WP_List_Table {
     public function prepare_items() {
         $columns = $this->get_columns();
         $hidden = array();
-        $sortable = array();
+        $sortable = array(
+            'order_id'        => array( 'order_id', true ),
+            'customer_name'   => array( 'customer_name', true ),
+            'order_date'      => array( 'order_date', true ),
+            'delivery_date'   => array( 'delivery_date', true ),
+            'two_days'        => array( 'two_days', true )
+        );
         $this->_column_headers = array( $columns, $hidden, $sortable );
         $this->process_bulk_action();
 
@@ -39,7 +45,9 @@ class wooproddelclass_Orders_With_Delivery_Dates_Table extends WP_List_Table {
             'per_page'    => $per_page
         ));
 
-        $this->items = self::get_orders_with_delivery_dates( $per_page, $current_page );
+        $orderby = ( !empty( $_REQUEST['orderby'] ) ) ? $_REQUEST['orderby'] : 'order_date';
+        $order = ( !empty( $_REQUEST['order'] ) ) ? $_REQUEST['order'] : 'asc';
+        $this->items = self::get_orders_with_delivery_dates( $per_page, $current_page, $orderby, $order );
     }
 
     public function column_default( $item, $column_name ) {
@@ -59,9 +67,12 @@ class wooproddelclass_Orders_With_Delivery_Dates_Table extends WP_List_Table {
         $delivery_date = new DateTime( sanitize_text_field( $item['delivery_date'] ) );
         $now = new DateTime();
         $diff = date_diff( $now, $delivery_date );
-        if ( $diff->days < 2 ) {
+        if ( $diff->invert==1) {
+            return '<p style="background-color:red; color:white; text-align: center; max-width:50%;">'.esc_html__('Past Order', 'customize-product-delivery-date').'</p>';
+        } 
+        if ( $diff->days <= 2) {
             return '<p style="background-color:#FFA07A; text-align: center; max-width:50%;">'.esc_html__('Yes', 'customize-product-delivery-date').'</p>';
-        } else {
+        }elseif ( $diff->days > 2 ) {
             return '<p style="background-color:green; text-align: center; max-width:50%;">'.esc_html__('No', 'customize-product-delivery-date').'</p>';
         }
     }
@@ -87,15 +98,17 @@ class wooproddelclass_Orders_With_Delivery_Dates_Table extends WP_List_Table {
         }
     }
 
-    private static function get_orders_with_delivery_dates( $per_page = 10, $page_number = 1 ) {
+    private static function get_orders_with_delivery_dates( $per_page = 10, $page_number = 1, $orderby, $order ) {
         global $wpdb;
-        $sql = "SELECT p.ID as order_id, p.post_date as order_date, pm.meta_value as delivery_date, u.display_name as customer_name
+        $sql = "SELECT p.ID as order_id, p.post_date as order_date, pm.meta_value as delivery_date, CONCAT(pm2.meta_value, ' ', pm3.meta_value) as customer_name,
+				CASE WHEN DATEDIFF(pm.meta_value, CURRENT_DATE()) <= 2 THEN 'Yes' ELSE 'No' END AS two_days
                 FROM {$wpdb->prefix}posts p
                 INNER JOIN {$wpdb->prefix}postmeta pm ON pm.post_id = p.ID
-                INNER JOIN {$wpdb->prefix}users u ON u.ID = p.post_author
+                LEFT JOIN {$wpdb->prefix}postmeta pm2 ON pm2.post_id = p.ID AND pm2.meta_key = '_billing_first_name'
+                LEFT JOIN {$wpdb->prefix}postmeta pm3 ON pm3.post_id = p.ID AND pm3.meta_key = '_billing_last_name'
                 WHERE p.post_type = %s
                 AND pm.meta_key = %s
-                ORDER BY delivery_date ASC";
+                ORDER BY $orderby $order";
         $sql .= " LIMIT %d";
         $sql .= ' OFFSET ' . ( $page_number - 1 ) * $per_page;
         $result = $wpdb->get_results( $wpdb->prepare( $sql, 'shop_order', '_wooproddel_delivery_date', $per_page ), ARRAY_A );
@@ -108,6 +121,7 @@ class wooproddelclass_Orders_With_Delivery_Dates_Table extends WP_List_Table {
 		}
 		
         return $result;
+        
     }
 
     public static function record_count() {
@@ -119,6 +133,3 @@ class wooproddelclass_Orders_With_Delivery_Dates_Table extends WP_List_Table {
         return $wpdb->get_var( $wpdb->prepare( $sql, 'shop_order', '_wooproddel_delivery_date' ) );
     }
 }
-
-
-?>

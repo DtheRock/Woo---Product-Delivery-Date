@@ -4,7 +4,7 @@ Plugin Name: Product Delivery Date
 Plugin URI: https://github.com/DtheRock/Woo---Product-Delivery-Date
 Description: This plugin allows customers to customize the delivery date for their products during the checkout process. 
 The plugin also allows the admin to set a minimum and maximum delivery time. There is also an admin page to view all orders with delivery dates.
-Version: 1.0.0
+Version: 1.0.1
 Author: ITCS 
 Author URI: https://itcybersecurity.gr/
 License: GPLv2 or later
