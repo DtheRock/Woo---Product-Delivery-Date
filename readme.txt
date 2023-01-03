@@ -33,3 +33,8 @@ No, this plugin does not support any other languages.
 
 = 1.0.0 =
 * Initial release.
+
+= Version 1.0.1 =
+1. Added sorting functionality for the "Orders with Delivery Dates" table.
+2. Added notice for past orders too in the "Orders with Delivery Dates" table
+3. Fixed an issue with the client name in the "Orders with Delivery Dates" table
