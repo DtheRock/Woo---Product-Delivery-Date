@@ -37,7 +37,7 @@ class wooproddelclass_Orders_With_Delivery_Dates_Table extends WP_List_Table {
         $this->_column_headers = array( $columns, $hidden, $sortable );
         $this->process_bulk_action();
 
-        $per_page = 10;
+        $per_page = 20;
         $current_page = $this->get_pagenum();
         $total_items = self::record_count();
         $this->set_pagination_args( array(
@@ -45,7 +45,7 @@ class wooproddelclass_Orders_With_Delivery_Dates_Table extends WP_List_Table {
             'per_page'    => $per_page
         ));
 
-        $orderby = ( !empty( $_REQUEST['orderby'] ) ) ? $_REQUEST['orderby'] : 'order_date';
+        $orderby = ( !empty( $_REQUEST['orderby'] ) ) ? $_REQUEST['orderby'] : 'delivery_date';
         $order = ( !empty( $_REQUEST['order'] ) ) ? $_REQUEST['order'] : 'asc';
         $this->items = self::get_orders_with_delivery_dates( $per_page, $current_page, $orderby, $order );
     }
@@ -98,7 +98,8 @@ class wooproddelclass_Orders_With_Delivery_Dates_Table extends WP_List_Table {
         }
     }
 
-    private static function get_orders_with_delivery_dates( $per_page = 10, $page_number = 1, $orderby, $order ) {
+   private static function get_orders_with_delivery_dates( $per_page = 20, $page_number = 1, $orderby, $order ) {
+        $is_activated = get_option( 'wooproddel_activation', '' );
         global $wpdb;
         $sql = "SELECT p.ID as order_id, p.post_date as order_date, pm.meta_value as delivery_date, CONCAT(pm2.meta_value, ' ', pm3.meta_value) as customer_name,
 				CASE WHEN DATEDIFF(pm.meta_value, CURRENT_DATE()) <= 2 THEN 'Yes' ELSE 'No' END AS two_days
@@ -107,29 +108,75 @@ class wooproddelclass_Orders_With_Delivery_Dates_Table extends WP_List_Table {
                 LEFT JOIN {$wpdb->prefix}postmeta pm2 ON pm2.post_id = p.ID AND pm2.meta_key = '_billing_first_name'
                 LEFT JOIN {$wpdb->prefix}postmeta pm3 ON pm3.post_id = p.ID AND pm3.meta_key = '_billing_last_name'
                 WHERE p.post_type = %s
-                AND pm.meta_key = %s
+                AND pm.meta_key like %s
                 ORDER BY $orderby $order";
-        $sql .= " LIMIT %d";
-        $sql .= ' OFFSET ' . ( $page_number - 1 ) * $per_page;
-        $result = $wpdb->get_results( $wpdb->prepare( $sql, 'shop_order', '_wooproddel_delivery_date', $per_page ), ARRAY_A );
+        $sql .= " LIMIT %d OFFSET %d";
+        
+        $resultorders = $wpdb->get_results( $wpdb->prepare( 
+          $sql, 
+          'shop_order', 
+          '_wooproddel_delivery_date'.'', 
+          $per_page, 
+          ( $page_number - 1 ) * $per_page ), ARRAY_A );
+        
+        
+        $sql2 ="SELECT oi.order_item_id as order_item_id, p.ID as order_id, p.post_date as order_date, oim.meta_value as delivery_date, CONCAT(pm2.meta_value, ' ', pm3.meta_value) as customer_name, 
+                CASE WHEN DATEDIFF(pm.meta_value, CURRENT_DATE()) <= 2 THEN 'Yes' ELSE 'No' END AS two_days 
+                        FROM {$wpdb->prefix}posts p 
+                        INNER JOIN {$wpdb->prefix}postmeta pm ON pm.post_id = p.ID 
+                        INNER JOIN {$wpdb->prefix}woocommerce_order_items oi ON oi.order_id = p.ID 
+                        INNER JOIN {$wpdb->prefix}woocommerce_order_itemmeta oim ON oim.order_item_id = oi.order_item_id 
+                        LEFT JOIN {$wpdb->prefix}postmeta pm2 ON pm2.post_id = p.ID AND pm2.meta_key = '_billing_first_name' 
+                        LEFT JOIN {$wpdb->prefix}postmeta pm3 ON pm3.post_id = p.ID AND pm3.meta_key = '_billing_last_name' 
+                        WHERE p.post_type = %s 
+                        AND oim.meta_key like %s
+                        AND p.post_status != 'wc-split'
+                        GROUP BY order_item_id
+                        ORDER BY $orderby $order";
+        $sql2 .= " LIMIT %d OFFSET %d";
+        $resultproducts = $wpdb->get_results( $wpdb->prepare( 
+          $sql2, 
+          'shop_order', 
+          'Delivery Date'.'', 
+          $per_page, 
+          ( $page_number - 1 ) * $per_page ), ARRAY_A );
+        if ( woopdd_fs()->is_plan('pro') && $is_activated == 1 ) {
+            $result = array_merge($resultorders, $resultproducts);
+            
+        }else{
+            $result = $resultorders;
+        }
+        
+
 		
 		// Escape/Sanitize all the data before returning.
-		foreach ( $result as &$item ) {
-			foreach ( $item as $key => &$value ) {
-				$value = sanitize_text_field( $value );
-			}
-		}
-		
+        foreach ( $result as &$item ) {
+            foreach ( $item as $key => &$value ) {
+                $value = sanitize_text_field( $value );
+            }
+        }
         return $result;
         
     }
+    
 
     public static function record_count() {
         global $wpdb;
         $sql = "SELECT COUNT(*) FROM {$wpdb->prefix}posts p
                 INNER JOIN {$wpdb->prefix}postmeta pm ON pm.post_id = p.ID
                 WHERE p.post_type = %s
-                AND pm.meta_key = %s";
-        return $wpdb->get_var( $wpdb->prepare( $sql, 'shop_order', '_wooproddel_delivery_date' ) );
+                AND pm.meta_key LIKE %s";
+        $sql2 = "SELECT COUNT(DISTINCT oim.order_item_id) FROM {$wpdb->prefix}posts p
+                INNER JOIN {$wpdb->prefix}postmeta pm ON pm.post_id = p.ID
+                INNER JOIN {$wpdb->prefix}woocommerce_order_items oi ON oi.order_id = p.ID 
+                INNER JOIN {$wpdb->prefix}woocommerce_order_itemmeta oim ON oim.order_item_id = oi.order_item_id 
+                WHERE p.post_type = %s
+                AND p.post_status != 'wc-split'
+                AND oim.meta_key LIKE %s";
+        $resultorders = $wpdb->get_var( $wpdb->prepare( $sql, 'shop_order', '_wooproddel_delivery_date' ) );
+        $resultproducts = $wpdb->get_var( $wpdb->prepare( $sql2, 'shop_order', 'Delivery Date' ) );
+       $result = intval($resultorders) + intval($resultproducts);
+       return $result;
+       echo $result;
     }
 }
