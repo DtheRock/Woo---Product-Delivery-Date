@@ -1,6 +1,6 @@
 === Product Delivery Date ===
 Contributors: ITCS
-Tags: delivery, dates, product
+Tags: Delivery, Dates, Product, Product Delivery, Delivery Date Customization, Order Splitting 
 Requires at least: 5.2
 Requires PHP: 7.4
 Tested up to: 6.1
