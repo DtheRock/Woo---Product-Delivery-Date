@@ -1,10 +1,10 @@
 === Product Delivery Date ===
-Contributors: ITCS
+Contributors: ITCS, freemius
 Tags: Delivery, Dates, Product, Product Delivery, Delivery Date Customization, Order Splitting 
 Requires at least: 5.2
 Requires PHP: 7.4
 Tested up to: 6.1
-Stable tag: 1.0.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,6 +62,14 @@ No, this plugin does not support any other languages.
 6. Email notification to customers when their orders are split. (pro feature)
 7. The email notification message can be modified in the plugin's respective admin settings (pro feature)
 
+= 1.1.1 = 
+1. Redesigned the Orders with Delivery Dates table with new features. 
+2. Added an export to excel functionality for the Orders with Delivery Dates. 
+3. Added the ability to dynamically change the delivery date of an order or a product from the table. 
+4. New sorting, filtering, and dynamic search functionality. 
+5. Added an option to make the delivery date required on the checkout page.
+5. Redesigned the Order Delivery Date Settings page.   
+
 == Changelog ==
 
 = 1.0.0 =
@@ -80,6 +88,15 @@ No, this plugin does not support any other languages.
 5. Split orders functionality. The orders can be split into separate orders based on the delivery date (pro feature) 
 6. Email notification to customers when their orders are split. (pro feature)
 7. The email notification message can be modified in the plugin's respective admin settings (pro feature)
+
+= Version 1.1.1 = 
+1. Redesigned the Orders with Delivery Dates table with new features. 
+2. Added an export to excel functionality for the Orders with Delivery Dates. 
+3. Added the ability to dynamically change the delivery date of an order or a product from the table. 
+4. New sorting, filtering, and dynamic search functionality. 
+5. Added an option to make the delivery date required on the checkout page.
+5. Redesigned the Order Delivery Date Settings page.   
+
 
 == Roadmap ==
 

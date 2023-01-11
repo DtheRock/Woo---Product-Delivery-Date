@@ -1,11 +1,11 @@
 <?php
 
 /*
-Plugin Name: Product Delivery Date
+Plugin Name: Product Delivery Date Professional
 Plugin URI: https://github.com/DtheRock/Woo---Product-Delivery-Date
 Description: This plugin allows customers to customize the delivery date for their products during the checkout process. 
 The plugin also allows the admin to set a minimum and maximum delivery time. There is also an admin page to view all orders with delivery dates.
-Version: 1.1.0
+Version: 1.1.1
 Author: ITCS 
 Author URI: https://itcybersecurity.gr/
 License: GPLv2 or later
@@ -60,8 +60,8 @@ if ( function_exists( 'woopdd_fs' ) ) {
     
     }
     $is_activated = get_option( 'wooproddel_activation', '' );
-    include_once plugin_dir_path( __FILE__ ) . 'dateorderstable.php';
     include_once plugin_dir_path( __FILE__ ) . 'dateorderscolumn.php';
+    include_once plugin_dir_path( __FILE__ ) . 'orderscalendar.php';
     
     if ( woopdd_fs()->is_plan( 'pro' ) && $is_activated == 1 ) {
         include_once plugin_dir_path( __FILE__ ) . 'dateordersproduct.php';
@@ -86,6 +86,14 @@ if ( function_exists( 'woopdd_fs' ) ) {
             $value = get_option( 'wooproddel_notification', '' );
             echo  '<input type="checkbox" name="wooproddel_notification" value="1" ' . checked( esc_attr( $value ), 1, false ) . '/>' ;
         }
+        
+        // Delivery Date Required checkbox callback
+        function wooproddel_date_required_callback()
+        {
+            //getting the option value and sanitizing it
+            $value = get_option( 'wooproddel_date_required', '' );
+            echo  '<input type="checkbox" name="wooproddel_date_required" value="1" ' . checked( esc_attr( $value ), 1, false ) . '/>' ;
+        }
     
     } else {
         // Activation checkbox callback
@@ -103,6 +111,14 @@ if ( function_exists( 'woopdd_fs' ) ) {
             $value = get_option( 'wooproddel_notification', '' );
             echo  '<input type="checkbox" name="wooproddel_notification" value="1" ' . checked( esc_attr( $value ), 1, false ) . 'disabled/>' ;
         }
+        
+        // Delivery Date Required checkbox callback
+        function wooproddel_date_required_callback()
+        {
+            //getting the option value and sanitizing it
+            $value = get_option( 'wooproddel_date_required', '' );
+            echo  '<input type="checkbox" name="wooproddel_date_required" value="1" ' . checked( esc_attr( $value ), 1, false ) . '/>' ;
+        }
     
     }
     
@@ -113,24 +129,6 @@ if ( function_exists( 'woopdd_fs' ) ) {
         echo  '<input type="checkbox" name="wooproddel_checkoutdates" value="1" ' . checked( esc_attr( $value ), 1, false ) . '/>' ;
     }
     
-    function wooproddelpluginstyles()
-    {
-        wp_enqueue_style( 'wooproddelpluginstyles', plugin_dir_url( __FILE__ ) . 'css/styles.css' );
-        //escaping the inline styles
-        $inline_styles = wp_strip_all_tags( '.cp-orders-with-delivery-dates-table th,
-                       .cp-orders-with-delivery-dates-table td {
-                           display: block;
-                       }
-                       .delivery-date-within-two-days {
-                                background-color: #FFA500;
-                            }
-                       .cp-orders-with-delivery-dates-table th {
-                           font-size: 14px;
-                       }' );
-        wp_add_inline_style( 'wooproddelpluginstyles', $inline_styles );
-    }
-    
-    add_action( 'wp_enqueue_scripts', 'wooproddelpluginstyles' );
     add_action( 'woocommerce_checkout_process', 'wooproddel_date_validation' );
     function wooproddel_date_validation()
     {
@@ -162,12 +160,13 @@ if ( function_exists( 'woopdd_fs' ) ) {
         $min_date = date( 'Y-m-d', strtotime( '+' . intval( $min_delivery_time ) . ' days' ) );
         $max_date = date( 'Y-m-d', strtotime( '+' . intval( $max_delivery_time ) . ' days' ) );
         $is_checkoutdates = get_option( 'wooproddel_checkoutdates', '' );
+        $is_date_required = get_option( 'wooproddel_date_required', '' );
         echo  '<div id="wooproddel_delivery_date_field"><h3>' . '</h3>' ;
         woocommerce_form_field( 'wooproddel_delivery_date', array(
             'type'     => 'date',
             'class'    => array( 'my-field-class form-row-wide' ),
             'label'    => esc_html__( 'Select a delivery date', 'customize-product-delivery-date' ),
-            'required' => false,
+            'required' => ( $is_date_required == 1 ? true : false ),
         ), $checkout->get_value( 'wooproddel_delivery_date' ) );
         if ( $is_checkoutdates == 1 ) {
             echo  '<p>' . esc_html__( 'Please select a delivery date between ' . esc_html( $min_date ) . ' and ' . esc_html( $max_date ) ) . '</p>' ;
@@ -207,8 +206,50 @@ if ( function_exists( 'woopdd_fs' ) ) {
             esc_html__( 'Delivery Date', 'customize-product-delivery-date' ),
             'manage_options',
             'wooproddel_settings',
-            'wooproddel_settings_page_callback'
+            'wooproddelpluginsettingstabcallback'
         );
+        add_submenu_page(
+            'wooproddelpluginsettingstab',
+            esc_html__( 'Email Settings', 'customize-product-delivery-date' ),
+            esc_html__( 'Email Settings', 'customize-product-delivery-date' ),
+            'manage_options',
+            'wooproddelpluginsettingstab',
+            'wooproddelpluginsettingstabcallback'
+        );
+    }
+    
+    // Plugin settings tab callback
+    function wooproddelpluginsettingstabcallback()
+    {
+        // Nonce
+        $nonce = wp_create_nonce( 'wooproddel_settings_tab_nonce' );
+        // Verify nonce
+        if ( isset( $_GET['wooproddel_settings_tab_nonce'] ) && !wp_verify_nonce( $_GET['wooproddel_settings_tab_nonce'], 'wooproddel_settings_tab_nonce' ) ) {
+            die( 'Security check failed' );
+        }
+        // Set default tab
+        $default_tab = 'datedelsettings';
+        
+        if ( isset( $_GET['tab'] ) && sanitize_text_field( $_GET['tab'] ) ) {
+            $active_tab = $_GET['tab'];
+        } else {
+            $active_tab = $default_tab;
+        }
+        
+        echo  "<h1>" . esc_html__( 'Order Delivery Date Settings', 'customize-product-delivery-date' ) . "</h1>" ;
+        echo  "<h2 class='nav-tab-wrapper'>" ;
+        echo  "<a href='admin.php?page=wooproddelpluginsettingstab&tab=datedelsettings&wooproddel_settings_tab_nonce=" . $nonce . "' class='nav-tab " . (( $active_tab == 'datedelsettings' ? 'nav-tab-active' : '' )) . "'>" . esc_html__( 'Date Delivery Settings', 'customize-product-delivery-date' ) . "</a>" ;
+        if ( woopdd_fs()->is_plan( 'pro' ) ) {
+            echo  "<a href='admin.php?page=wooproddelpluginsettingstab&tab=emailsettings&wooproddel_settings_tab_nonce=" . $nonce . "' class='nav-tab " . (( $active_tab == 'emailsettings' ? 'nav-tab-active' : '' )) . "'>" . esc_html__( 'Email Settings', 'customize-product-delivery-date' ) . "</a>" ;
+        }
+        echo  "</h2>" ;
+        
+        if ( $active_tab == 'datedelsettings' ) {
+            wooproddel_settings_page_callback();
+        } elseif ( $active_tab == 'emailsettings' ) {
+            split_order_settings_page();
+        }
+    
     }
     
     // Settings page callback
@@ -223,34 +264,6 @@ if ( function_exists( 'woopdd_fs' ) ) {
         echo  '</form>' ;
     }
     
-    
-    if ( woopdd_fs()->is_plan( 'pro' ) && $is_activated == 1 ) {
-        // Add extra tab to the settings page
-        add_action( 'admin_menu', 'wooproddel_add_settings_tab' );
-        function wooproddel_add_settings_tab()
-        {
-            add_submenu_page(
-                'woocommerce',
-                esc_html__( 'Order Delivery Date Settings Tab
-', 'customize-product-delivery-date' ),
-                esc_html__( 'Order Delivery Date Settings Tab
-', 'customize-product-delivery-date' ),
-                'manage_options',
-                'wooproddelpluginsettingstab',
-                'wooproddelpluginsettingstabcallback'
-            );
-        }
-        
-        // Plugin settings tab callback
-        function wooproddelpluginsettingstabcallback()
-        {
-            echo  "<h1>Order Delivery Date Settings</h1>" ;
-            echo  "<p>You can setup your settings here.</p>" ;
-            split_order_settings_page();
-        }
-    
-    }
-    
     // Register settings
     add_action( 'admin_init', 'wooproddel_register_settings' );
     function wooproddel_register_settings()
@@ -260,6 +273,7 @@ if ( function_exists( 'woopdd_fs' ) ) {
         register_setting( 'wooproddel_settings', 'wooproddel_messages', 'wp_kses_post' );
         register_setting( 'wooproddel_settings', 'wooproddel_activation', 'intval' );
         register_setting( 'wooproddel_settings', 'wooproddel_notification', 'intval' );
+        register_setting( 'wooproddel_settings', 'wooproddel_date_required', 'intval' );
         register_setting( 'wooproddel_settings', 'wooproddel_checkoutdates', 'intval' );
         add_settings_section(
             'wooproddel_settings_section',
@@ -301,6 +315,14 @@ if ( function_exists( 'woopdd_fs' ) ) {
             'wooproddel_notification',
             esc_html__( 'Email Notification for Order Spliting', 'customize-product-delivery-date' ),
             'wooproddel_notification_callback',
+            'wooproddel_settings',
+            'wooproddel_settings_section'
+        );
+        // Add Date Required checkbox
+        add_settings_field(
+            'wooproddel_date_required',
+            esc_html__( 'Make Order Delivery Date Field Required in Checkout', 'customize-product-delivery-date' ),
+            'wooproddel_date_required_callback',
             'wooproddel_settings',
             'wooproddel_settings_section'
         );
@@ -384,9 +406,7 @@ if ( function_exists( 'woopdd_fs' ) ) {
     {
         //escaping the output
         echo  '<h1>' . esc_html__( 'Orders with Delivery Dates', 'customize-product-delivery-date' ) . '</h1>' ;
-        $orders_with_delivery_dates_table = new wooproddelclass_Orders_With_Delivery_Dates_Table();
-        $orders_with_delivery_dates_table->prepare_items();
-        $orders_with_delivery_dates_table->display();
+        echo  do_shortcode( '[wooproddel_calendar]' ) ;
     }
     
     // Display the message at the checkout page
