@@ -1,5 +1,5 @@
 === Product Delivery Date ===
-Contributors: ITCS, freemius
+Contributors: ITCS
 Tags: Delivery, Dates, Product, Product Delivery, Delivery Date Customization, Order Splitting 
 Requires at least: 5.2
 Requires PHP: 7.4
@@ -18,6 +18,24 @@ The Pro version of this plugin offers even more features, such as the ability to
 
 With Product Delivery Date, you can offer your customers the freedom to choose when their product is delivered, and you can manage your orders more efficiently with the advanced features the Pro version offers. So why wait? Get Product Delivery Date today and give your customers the freedom to choose when their product is delivered!
 
+
+== Free Version Features == 
+1. Assign global Order Delivery Dates
+2. Display Custom Message on the checkout page Date Picker
+3. Orders central management from an interactive table
+4. Option to easily modify the order delivery date from a datepicker on the table
+5. Option to export in excel the orders with delivery dates 
+6. Make Order Delivery Date field required in checkout
+7. Option to show the available dates on the checkout page	
+
+== Pro Version Features ==
+1. All the free version features 
+2. Option to enable delivery date per product
+3. Assign a delivery date on the admin product settings page 
+4. Assign delivery dates to woocommerce products from the product bulk edit options
+5. Split orders option. The orders that contain more than one items with different delivery dates, can be split by delivery dates and create sub-orders. 
+6. Email notification option. The customer email notification text can be modified from the plugin admin settings
+7. Option to easily modify the product delivery date from a datepicker on the Orders with Delivery Dates table  
 
 == Installation ==
 
