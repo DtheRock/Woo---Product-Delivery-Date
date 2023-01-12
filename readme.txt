@@ -1,5 +1,6 @@
 === Product Delivery Date ===
 Contributors: ITCS
+Donate link: https://www.paypal.com/donate/?hosted_button_id=65RC9CCSA78MS 
 Tags: Delivery, Dates, Order Delivery, Product Delivery
 Requires at least: 5.2
 Requires PHP: 7.4
@@ -125,3 +126,7 @@ The following list outlines the upcoming features for our plugin:
 3. Order management system, through which the admin will be able to set a maximum number of deliveries per time slot
 
 We welcome feedback on our roadmap and would love to hear your ideas and suggestions. Please let us know how we can improve our plugin to better suit your needs.
+
+Donate to support Product Delivery Date
+
+If you would like to support the development of Product Delivery Date, please consider making a donation. Your support will help us to continue to improve the plugin and make it better for everyone.
