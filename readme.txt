@@ -1,5 +1,5 @@
 === Product Delivery Date ===
-Contributors: ITCS
+Contributors: ITCS, freemius
 Donate link: https://www.paypal.com/donate/?hosted_button_id=65RC9CCSA78MS 
 Tags: Delivery, Dates, Order Delivery, Product Delivery
 Requires at least: 5.2
